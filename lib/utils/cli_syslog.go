@@ -3,11 +3,12 @@
 package utils
 
 import (
-  "log/syslog"
-  "os"
+	"io/ioutil"
+	"log/syslog"
+	"os"
 
-  log "github.com/sirupsen/logrus"
-  logrusSyslog "github.com/sirupsen/logrus/hooks/syslog"
+	log "github.com/sirupsen/logrus"
+	logrusSyslog "github.com/sirupsen/logrus/hooks/syslog"
 )
 
 // SwitchLoggingtoSyslog tells the logger to send the output to syslog

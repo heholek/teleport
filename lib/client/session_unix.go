@@ -12,11 +12,11 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
+	"github.com/docker/docker/pkg/term"
 	"github.com/gravitational/teleport/lib/defaults"
 	"github.com/gravitational/teleport/lib/events"
 	"github.com/gravitational/teleport/lib/session"
 	"github.com/gravitational/teleport/lib/sshutils"
-	"github.com/moby/moby/pkg/term"
 
 	log "github.com/sirupsen/logrus"
 )
