@@ -31,8 +31,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// accessPoint returns access point based on the cache policy
-func (tc *TeleportClient) accessPointWin(clt auth.AccessPoint, proxyHostPort string, clusterName string) (auth.AccessPoint, error) {
+// accessPoint returns a caching auth.AccessPoint.
+func (tc *TeleportClient) accessPoint(clt auth.AccessPoint, proxyHostPort string, clusterName string) (auth.AccessPoint, error) {
 	if tc.CachePolicy == nil {
 		logrus.Debugf("not using caching access point")
 		return clt, nil

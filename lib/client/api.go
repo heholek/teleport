@@ -33,7 +33,6 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -42,15 +41,12 @@ import (
 
 	"github.com/gravitational/teleport"
 	"github.com/gravitational/teleport/lib/auth"
-	"github.com/gravitational/teleport/lib/backend"
-	"github.com/gravitational/teleport/lib/backend/dir"
 	"github.com/gravitational/teleport/lib/defaults"
 	"github.com/gravitational/teleport/lib/events"
 	"github.com/gravitational/teleport/lib/services"
 	"github.com/gravitational/teleport/lib/session"
 	"github.com/gravitational/teleport/lib/shell"
 	"github.com/gravitational/teleport/lib/sshutils/scp"
-	"github.com/gravitational/teleport/lib/state"
 	"github.com/gravitational/teleport/lib/utils"
 	"github.com/gravitational/teleport/lib/utils/agentconn"
 
@@ -655,39 +651,6 @@ func NewClient(c *Config) (tc *TeleportClient, err error) {
 	}
 
 	return tc, nil
-}
-
-// accessPoint returns access point based on the cache policy
-func (tc *TeleportClient) accessPoint(clt auth.AccessPoint, proxyHostPort string, clusterName string) (auth.AccessPoint, error) {
-	if runtime.GOOS == "windows" {
-		return clt, nil
-	}
-
-	return tc.accessPointWin(clt, proxyHostPort, clusterName)
-
-	//if tc.CachePolicy == nil {
-	//	log.Debugf("not using caching access point")
-	//	return clt, nil
-	//}
-	//dirPath, err := initKeysDir(tc.KeysDir)
-	//if err != nil {
-	//	return nil, trace.Wrap(err)
-	//}
-	//path := filepath.Join(dirPath, "cache", proxyHostPort, clusterName)
-
-	//log.Debugf("using caching access point %v", path)
-	//cacheBackend, err := dir.New(backend.Params{"path": path})
-	//if err != nil {
-	//	return nil, trace.Wrap(err)
-	//}
-	//// make a caching auth client for the auth server:
-	//return state.NewCachingAuthClient(state.Config{
-	//	SkipPreload:  true,
-	//	AccessPoint:  clt,
-	//	Backend:      cacheBackend,
-	//	CacheMaxTTL:  tc.CachePolicy.CacheTTL,
-	//	NeverExpires: tc.CachePolicy.NeverExpires,
-	//})
 }
 
 func (tc *TeleportClient) LocalAgent() *LocalKeyAgent {
