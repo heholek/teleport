@@ -1,7 +1,7 @@
 // +build !windows
 
 /*
-Copyright 2015 Gravitational, Inc.
+Copyright 2017 Gravitational, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,20 +42,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	DefaultShell = "/bin/sh"
-)
-
-// GetLoginShell determines the login shell for a given username
+// getLoginShell determines the login shell for a given username
 func getLoginShell(username string) (string, error) {
-	// see if the username is valid
+	// See if the username is valid.
 	_, err := user.Lookup(username)
 	if err != nil {
 		return "", trace.Wrap(err)
 	}
 
-	// based on stdlib user/lookup_unix.go packages which does not return user shell
-	// https://golang.org/src/os/user/lookup_unix.go
+	// Based on stdlib user/lookup_unix.go packages which does not return
+	// user shell: https://golang.org/src/os/user/lookup_unix.go
 	var pwd C.struct_passwd
 	var result *C.struct_passwd
 
@@ -64,7 +60,7 @@ func getLoginShell(username string) (string, error) {
 		bufSize = 1024
 	}
 	if bufSize <= 0 || bufSize > 1<<20 {
-		return "", trace.Errorf("lookupPosixShell: unreasonable _SC_GETPW_R_SIZE_MAX of %d", bufSize)
+		return "", trace.BadParameter("lookupPosixShell: unreasonable _SC_GETPW_R_SIZE_MAX of %d", bufSize)
 	}
 	buf := C.malloc(C.size_t(bufSize))
 	defer C.free(buf)
@@ -78,12 +74,15 @@ func getLoginShell(username string) (string, error) {
 		&result)
 	if rv != 0 || result == nil {
 		log.Errorf("lookupPosixShell: lookup username %s: %s", username, syscall.Errno(rv))
-		return "", trace.Errorf("cannot determine shell for %s", username)
+		return "", trace.BadParameter("cannot determine shell for %s", username)
 	}
+
+	// If no shell was found, return trace.NotFound to allow the caller to set
+	// the default shell.
 	shellCmd := strings.TrimSpace(C.GoString(pwd.pw_shell))
 	if len(shellCmd) == 0 {
-		log.Warnf("no shell specified for %s. using default=%s", username, DefaultShell)
-		shellCmd = DefaultShell
+		return "", trace.NotFound("no shell specified for %v", username)
 	}
+
 	return shellCmd, nil
 }

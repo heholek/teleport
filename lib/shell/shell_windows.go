@@ -22,6 +22,6 @@ import (
 	"github.com/gravitational/trace"
 )
 
-func GetLoginShell(username string) (string, error) {
+func getLoginShell(username string) (string, error) {
 	return "", trace.BadParameter("login shell on Windows is not supported")
 }
