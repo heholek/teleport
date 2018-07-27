@@ -18,6 +18,20 @@ limitations under the License.
 
 package shell
 
+/*
+#cgo solaris CFLAGS: -D_POSIX_PTHREAD_SEMANTICS
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <stdlib.h>
+
+static int mygetpwnam_r(const char *name, struct passwd *pwd,
+	char *buf, size_t buflen, struct passwd **result) {
+	return getpwnam_r(name, pwd, buf, buflen, result);
+}
+*/
+import "C"
+
 import (
 	"os/user"
 	"strings"
@@ -33,9 +47,7 @@ const (
 )
 
 // GetLoginShell determines the login shell for a given username
-func GetLoginShell(username string) (string, error) {
-	getLoginShell(
-
+func getLoginShell(username string) (string, error) {
 	// see if the username is valid
 	_, err := user.Lookup(username)
 	if err != nil {
